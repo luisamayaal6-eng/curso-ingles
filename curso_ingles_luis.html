@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curso Intensivo de Inglés — Luis</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+.app { max-width: 820px; margin: 0 auto; padding: 20px 16px; }
+
+/* HEADER */
+.header { background: linear-gradient(135deg, #1e3a5f, #2e75b6); border-radius: 16px; padding: 28px 28px; margin-bottom: 24px; }
+.header h1 { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.header p { color: #bdd7ee; font-size: 14px; }
+.progress-wrap { margin-top: 16px; display: flex; gap: 4px; }
+.prog-day { flex: 1; height: 6px; border-radius: 99px; background: #ffffff30; transition: background 0.3s; }
+.prog-day.done { background: #4ade80; }
+.prog-day.active { background: #60a5fa; }
+
+/* NAV TABS */
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.tab { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #334155; background: #1e293b; color: #94a3b8; transition: all 0.2s; }
+.tab.active { background: #2e75b6; border-color: #2e75b6; color: #fff; }
+.tab:hover:not(.active) { border-color: #2e75b6; color: #e2e8f0; }
+
+/* SECTIONS */
+.section { display: none; }
+.section.active { display: block; }
+
+/* CARDS */
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; margin-bottom: 16px; }
+.card-title { font-size: 16px; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.card-body { font-size: 14px; color: #94a3b8; line-height: 1.7; }
+.card-body strong { color: #cbd5e1; }
+
+/* LESSON */
+.lesson-block { background: #0f172a; border-radius: 10px; padding: 16px; margin-top: 12px; }
+.lesson-block .label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #2e75b6; margin-bottom: 8px; }
+.phrase-list { list-style: none; }
+.phrase-list li { padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+.phrase-list li:last-child { border-bottom: none; }
+.phrase-list .en { color: #e2e8f0; font-weight: 600; flex: 1; }
+.phrase-list .es { color: #64748b; font-size: 13px; flex: 1; font-style: italic; }
+
+/* PRACTICE */
+.practice-box { background: #0f172a; border-radius: 10px; padding: 20px; margin-top: 12px; }
+.scenario-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #f59e0b; margin-bottom: 10px; }
+.scenario-text { font-size: 15px; color: #e2e8f0; line-height: 1.6; margin-bottom: 16px; border-left: 3px solid #2e75b6; padding-left: 12px; }
+textarea { width: 100%; background: #1e293b; border: 1.5px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 14px; padding: 12px; resize: vertical; min-height: 100px; font-family: inherit; transition: border-color 0.2s; }
+textarea:focus { outline: none; border-color: #2e75b6; }
+.btn { display: inline-block; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: #2e75b6; color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-secondary { background: #334155; color: #cbd5e1; }
+.btn-secondary:hover { background: #475569; }
+.btn-green { background: #166534; color: #4ade80; }
+.btn-green:hover { background: #14532d; }
+.btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+
+/* AI FEEDBACK */
+.feedback-box { border-radius: 10px; padding: 16px; margin-top: 14px; display: none; }
+.feedback-box.show { display: block; }
+.feedback-box.good { background: #14532d20; border: 1px solid #22c55e40; }
+.feedback-box.ok { background: #92400e20; border: 1px solid #f59e0b40; }
+.feedback-score { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+.feedback-score.good { color: #4ade80; }
+.feedback-score.ok { color: #fbbf24; }
+.feedback-text { font-size: 14px; color: #94a3b8; line-height: 1.7; }
+.feedback-text strong { color: #cbd5e1; }
+.loading { text-align: center; padding: 20px; color: #64748b; font-size: 14px; }
+.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #334155; border-top-color: #2e75b6; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ROLEPLAY */
+.chat-window { background: #0f172a; border-radius: 10px; padding: 16px; min-height: 200px; max-height: 380px; overflow-y: auto; margin-bottom: 12px; }
+.msg { margin-bottom: 12px; display: flex; gap: 10px; align-items: flex-start; }
+.msg.user { flex-direction: row-reverse; }
+.msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+.msg.bot .msg-bubble { background: #1e293b; color: #e2e8f0; }
+.msg.user .msg-bubble { background: #2e75b6; color: #fff; }
+.msg-label { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; }
+.msg.user .msg-label { text-align: right; }
+.roleplay-controls { display: flex; gap: 8px; }
+.roleplay-controls textarea { min-height: 60px; flex: 1; }
+
+/* QUIZ */
+.quiz-question { font-size: 16px; font-weight: 600; color: #e2e8f0; margin-bottom: 16px; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option { padding: 12px 16px; border-radius: 8px; border: 1.5px solid #334155; background: #0f172a; cursor: pointer; font-size: 14px; color: #cbd5e1; transition: all 0.15s; text-align: left; }
+.quiz-option:hover:not(.disabled) { border-color: #2e75b6; color: #e2e8f0; }
+.quiz-option.correct { border-color: #22c55e; background: #14532d30; color: #86efac; }
+.quiz-option.wrong { border-color: #ef4444; background: #7f1d1d30; color: #fca5a5; }
+.quiz-option.disabled { cursor: default; }
+.quiz-feedback { margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 14px; line-height: 1.6; }
+.quiz-feedback.correct { background: #14532d20; border: 1px solid #22c55e40; color: #86efac; }
+.quiz-feedback.wrong { background: #7f1d1d20; border: 1px solid #ef444440; color: #fca5a5; }
+
+/* PROGRESS */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.stat-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px; text-align: center; }
+.stat-num { font-size: 28px; font-weight: 800; color: #60a5fa; }
+.stat-label { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+.day-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.day-btn { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #334155; background: #1e293b; color: #94a3b8; transition: all 0.2s; }
+.day-btn.active { background: #1e3a5f; border-color: #2e75b6; color: #60a5fa; }
+
+.tip-box { background: #1e3a5f30; border: 1px solid #2e75b640; border-radius: 10px; padding: 14px 16px; margin-top: 12px; font-size: 13px; color: #93c5fd; line-height: 1.6; }
+.tip-box strong { color: #bfdbfe; }
+
+@media (max-width: 500px) { .stat-grid { grid-template-columns: 1fr 1fr; } .tabs { gap: 6px; } .tab { padding: 7px 12px; font-size: 12px; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <h1>🎯 Curso Intensivo de Inglés — Luis</h1>
+    <p>Customer Service & Sales Representative · Evaluación oral · 75% requerido · Meta: lograrlo en esta semana</p>
+    <div class="progress-wrap" id="progressDays"></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('lessons')">📚 Lecciones</div>
+    <div class="tab" onclick="showTab('practice')">✍️ Práctica</div>
+    <div class="tab" onclick="showTab('roleplay')">🎭 Roleplay</div>
+    <div class="tab" onclick="showTab('quiz')">🧠 Quiz</div>
+    <div class="tab" onclick="showTab('tips')">💡 Tips orales</div>
+  </div>
+
+  <!-- LECCIONES -->
+  <div class="section active" id="sec-lessons">
+    <div class="day-selector" id="daySelector"></div>
+
+    <div id="lessonContent"></div>
+  </div>
+
+  <!-- PRÁCTICA ESCRITA -->
+  <div class="section" id="sec-practice">
+    <div class="card">
+      <div class="card-title">✍️ Práctica con evaluación de IA</div>
+      <div class="card-body">Elige un escenario, escribe tu respuesta en inglés y la IA te evalúa con puntuación y feedback detallado.</div>
+    </div>
+
+    <div id="practiceContent"></div>
+  </div>
+
+  <!-- ROLEPLAY -->
+  <div class="section" id="sec-roleplay">
+    <div class="card">
+      <div class="card-title">🎭 Roleplay con IA</div>
+      <div class="card-body">Practica conversaciones reales. La IA juega el rol de cliente difícil o supervisor. Tú respondes en inglés como si fuera una llamada real.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Elige el escenario:</div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="startRoleplay('angry')">😡 Cliente enojado</button>
+        <button class="btn btn-secondary" onclick="startRoleplay('sales')">💼 Llamada de ventas</button>
+        <button class="btn btn-secondary" onclick="startRoleplay('interview')">🎙️ Entrevista de trabajo</button>
+        <button class="btn btn-secondary" onclick="startRoleplay('support')">🎧 Soporte técnico</button>
+      </div>
+    </div>
+
+    <div class="card" id="roleplayCard" style="display:none">
+      <div class="card-title" id="roleplayTitle"></div>
+      <div class="chat-window" id="chatWindow"></div>
+      <div class="roleplay-controls">
+        <textarea id="userMsg" placeholder="Escribe tu respuesta en inglés..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+        <button class="btn btn-primary" onclick="sendMsg()">Enviar</button>
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-green" onclick="endRoleplay()">✅ Terminar y evaluar</button>
+        <button class="btn btn-secondary" onclick="startRoleplay(currentScenario)">🔄 Reiniciar</button>
+      </div>
+      <div id="roleplayFeedback"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="section" id="sec-quiz">
+    <div class="card">
+      <div class="card-title">🧠 Quiz de evaluación</div>
+      <div class="card-body">Preguntas de situaciones reales de customer service y sales. Igual formato que una evaluación real de inglés laboral.</div>
+    </div>
+    <div id="quizContent"></div>
+  </div>
+
+  <!-- TIPS ORALES -->
+  <div class="section" id="sec-tips">
+    <div class="card">
+      <div class="card-title">💡 Tips para la evaluación oral</div>
+      <div class="card-body">Técnicas específicas para sonar profesional en una llamada o videollamada en inglés, aunque tengas nervios.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧠 Antes de la llamada</div>
+      <div class="lesson-block">
+        <ul class="phrase-list">
+          <li><span class="en">Warm up your voice 10 minutes before</span><span class="es">Calienta tu voz 10 min antes — habla en voz alta, no susurres</span></li>
+          <li><span class="en">Have a glass of water next to you</span><span class="es">Agua cerca — la boca seca arruina la pronunciación</span></li>
+          <li><span class="en">Write 5 key phrases on a sticky note</span><span class="es">5 frases clave en un papel al lado — no las memorices, solo tenlas de referencia</span></li>
+          <li><span class="en">Test your mic and internet first</span><span class="es">Prueba micrófono e internet 30 min antes, no 2 min antes</span></li>
+          <li><span class="en">Stand or sit straight — it affects your voice</span><span class="es">Postura recta — afecta directamente cómo suena tu voz</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎙️ Durante la llamada — técnicas clave</div>
+      <div class="lesson-block">
+        <ul class="phrase-list">
+          <li><span class="en">Speak slower than you think you should</span><span class="es">Habla más lento de lo que crees necesario — la claridad > la velocidad</span></li>
+          <li><span class="en">"Could you give me just a moment?"</span><span class="es">Úsalo para ganar 3-5 segundos cuando no sabes qué decir</span></li>
+          <li><span class="en">"Just to make sure I understand correctly..."</span><span class="es">Para repetir lo que dijeron y ganar tiempo para pensar</span></li>
+          <li><span class="en">Smile while you talk — it changes your tone</span><span class="es">Sonríe mientras hablas — literalmente cambia el tono de tu voz</span></li>
+          <li><span class="en">If you don't understand: "I'm sorry, could you repeat that?"</span><span class="es">Nunca adivines — siempre pide que repitan si no entendiste</span></li>
+          <li><span class="en">End sentences fully — don't trail off</span><span class="es">Termina las frases completamente, no las dejes inconclusas</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚨 Si te trabas o te pones nervioso</div>
+      <div class="lesson-block">
+        <ul class="phrase-list">
+          <li><span class="en">"That's a great question, let me think about that for a second."</span><span class="es">Compra tiempo de forma profesional</span></li>
+          <li><span class="en">"What I mean to say is..."</span><span class="es">Para corregirte sin sonar inseguro</span></li>
+          <li><span class="en">"Let me rephrase that..."</span><span class="es">Para empezar la misma idea de otra forma si te enredaste</span></li>
+          <li><span class="en">Take a breath — 1 second of silence is fine</span><span class="es">1 segundo de silencio es normal y profesional, no es un error</span></li>
+          <li><span class="en">"I want to make sure I give you the best answer..."</span><span class="es">Para justificar que te tomas un momento antes de responder</span></li>
+        </ul>
+      </div>
+      <div class="tip-box">
+        <strong>🔑 La verdad sobre el acento:</strong> En customer service y sales, lo más importante NO es el acento perfecto — es la claridad, la actitud positiva y que el cliente te entienda. Tu acento latinoamericano es completamente aceptable. No lo escondas, habla con confianza.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Frases de cierre profesional</div>
+      <div class="lesson-block">
+        <ul class="phrase-list">
+          <li><span class="en">"Is there anything else I can help you with today?"</span><span class="es">Cierre estándar de customer service — memoriza esta exacta</span></li>
+          <li><span class="en">"Thank you so much for your time, I really appreciate it."</span><span class="es">Para cerrar una entrevista o llamada de ventas</span></li>
+          <li><span class="en">"I look forward to hearing from you."</span><span class="es">Al final de entrevistas — suena muy profesional</span></li>
+          <li><span class="en">"It was a pleasure speaking with you today."</span><span class="es">Cierre cálido para cualquier tipo de llamada</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────
+const days = [
+  {
+    label: "Día 1", title: "Fundamentos: Saludar, presentarte y abrir conversaciones",
+    focus: "Lo primero que escucha el evaluador. Tu apertura marca el tono de toda la llamada.",
+    phrases: [
+      { en: "Thank you for calling [Company], this is Luis speaking. How may I help you today?", es: "Apertura estándar de customer service" },
+      { en: "Good morning/afternoon! My name is Luis. How can I assist you?", es: "Versión más cálida y casual" },
+      { en: "Hi [Name], I'm calling from [Company] regarding...", es: "Apertura para llamadas de ventas salientes" },
+      { en: "I appreciate you taking the time to speak with me today.", es: "Para ventas — muestra respeto por su tiempo" },
+      { en: "Before we get started, may I have your name please?", es: "Para obtener el nombre del cliente" },
+      { en: "I want to make sure I'm reaching the right person — are you in charge of [X]?", es: "Para calificar al prospecto en ventas" },
+    ],
+    practice: "Imagina que es tu primer día en customer service. Suena el teléfono. El cliente dice: 'Hello, I'm calling because I have a problem with my order.' Escribe cómo respondes desde el saludo hasta pedirle más información.",
+    tip: "Practica tu apertura en voz alta 10 veces hasta que salga automático sin pensar."
+  },
+  {
+    label: "Día 2", title: "Manejo de problemas y quejas",
+    focus: "El corazón del customer service. El cliente está frustrado — tú debes calmarlo y resolver.",
+    phrases: [
+      { en: "I completely understand your frustration, and I sincerely apologize for the inconvenience.", es: "Validar + disculparse — siempre juntos" },
+      { en: "I'm going to do everything I can to resolve this for you right away.", es: "Muestra compromiso inmediato" },
+      { en: "Let me pull up your account so I can take a better look at this.", es: "Para ganar tiempo mientras buscas información" },
+      { en: "I can see why that would be upsetting — that's not the experience we want for you.", es: "Empatía específica, no genérica" },
+      { en: "Here's what I'm going to do for you today...", es: "Para presentar la solución con confianza" },
+      { en: "Would it be okay if I put you on a brief hold while I look into this?", es: "Siempre pedir permiso antes de poner en espera" },
+      { en: "I've gone ahead and [action taken]. You should see this reflected within [timeframe].", es: "Para confirmar la solución tomada" },
+    ],
+    practice: "Un cliente llama furioso: 'I've been waiting 3 weeks for my package and nobody can tell me where it is! This is unacceptable!' Escribe tu respuesta completa — desde calmarlo hasta darle una solución concreta.",
+    tip: "Nunca digas 'That's not my department' o 'I can't do that' sin ofrecer una alternativa inmediatamente."
+  },
+  {
+    label: "Día 3", title: "Ventas: Descubrir necesidades y presentar valor",
+    focus: "No vendes el producto — vendes la solución al problema del cliente.",
+    phrases: [
+      { en: "Can I ask what's currently your biggest challenge with [area]?", es: "La pregunta más poderosa en ventas — descubre el pain point" },
+      { en: "What would the ideal solution look like for you?", es: "Dejas que el cliente describa lo que necesita" },
+      { en: "Based on what you've told me, I think [product/service] would be a great fit because...", es: "Conecta su necesidad con tu solución" },
+      { en: "A lot of our customers in your situation have seen [specific result].", es: "Prueba social sin mentir" },
+      { en: "What's most important to you when it comes to [area]?", es: "Identifica su prioridad para personalizar el pitch" },
+      { en: "If we could solve [specific problem], would that be valuable for your business?", es: "Mini cierre de validación antes del precio" },
+    ],
+    practice: "Estás en una llamada de ventas. El cliente dice: 'I'm interested but I'm already using a competitor's service and it works fine.' Escribe cómo respondes — sin atacar al competidor pero mostrando tu valor.",
+    tip: "Escucha más de lo que hablas. 60% escuchar, 40% hablar — esa es la proporción ideal en ventas."
+  },
+  {
+    label: "Día 4", title: "Manejo de objeciones",
+    focus: "Las objeciones son señales de interés, no de rechazo. Cada 'no' esconde una pregunta.",
+    phrases: [
+      { en: "I hear you. Can I ask — compared to what? What would make this feel right for you?", es: "Para objeción de precio" },
+      { en: "That's completely fair. What specifically is holding you back?", es: "Para cualquier objeción — suena razonable, no defensivo" },
+      { en: "I understand. Many of our clients felt the same way at first, until they realized...", es: "Feel/Felt/Found — técnica clásica de objeciones" },
+      { en: "If the [price/timing/concern] weren't an issue, is this something you'd want to move forward with?", es: "Aisla la objeción real" },
+      { en: "What would need to happen for this to make sense for you?", es: "Pones al cliente en control — él te dice qué necesita" },
+      { en: "I respect that. Would it be okay if I followed up in [timeframe]?", es: "Para cuando el no es definitivo por ahora" },
+    ],
+    practice: "El cliente dice: 'Your price is too high. I can get the same thing cheaper somewhere else.' Escribe tu respuesta completa — no bajes el precio inmediatamente, primero entiende la objeción real.",
+    tip: "Nunca argumentes contra una objeción directamente. Primero valida, luego pregunta, luego responde."
+  },
+  {
+    label: "Día 5", title: "Cierre y seguimiento",
+    focus: "El cierre no es un momento, es el resultado natural de una buena conversación.",
+    phrases: [
+      { en: "Based on everything we've discussed, I think we're a great fit. Would you like to move forward?", es: "Cierre directo — funciona cuando hubo buena conversación" },
+      { en: "What would it take to get started today?", es: "Cierre por acción — los pone a pensar en el siguiente paso" },
+      { en: "I'll send you a summary of everything we discussed today. Does [email] still work for you?", es: "Cierre de seguimiento — siempre termina con un next step" },
+      { en: "Is there anything else you'd need from me before making a decision?", es: "Para identificar objeciones ocultas al final" },
+      { en: "I'll follow up with you on [day]. Does [time] work for a quick check-in?", es: "Agenda el seguimiento antes de colgar" },
+      { en: "It was a pleasure speaking with you today, [Name]. I look forward to working with you.", es: "Cierre cálido y profesional" },
+    ],
+    practice: "Has tenido una muy buena llamada de ventas. El cliente dice 'This sounds good, let me think about it and I'll get back to you.' Escribe cómo respondes para no perder el momentum sin sonar presionador.",
+    tip: "'I'll think about it' casi siempre significa que falta información o hay una objeción no expresada. Siempre pregunta qué necesitan para decidir."
+  },
+  {
+    label: "Día 6", title: "Entrevista de trabajo — respuestas en inglés",
+    focus: "Preguntas que casi seguro te van a hacer en la evaluación o entrevista.",
+    phrases: [
+      { en: "Tell me about yourself.", es: "30 segundos: quién eres + experiencia + por qué este rol" },
+      { en: "What's your experience in customer service / sales?", es: "Menciona Coprodisa, menciona resultados, sé específico" },
+      { en: "How do you handle a difficult or angry customer?", es: "Fórmula: Escuchar → Empatizar → Resolver → Confirmar" },
+      { en: "Why do you want to work remotely?", es: "Flexibilidad + productividad + disponibilidad para el cliente" },
+      { en: "What's your greatest strength?", es: "Bilingüe + rápido aprendizaje + orientado a resultados" },
+      { en: "Where do you see yourself in 1-2 years?", es: "Crecimiento dentro de la empresa, adquirir más habilidades" },
+    ],
+    practice: "La entrevistadora te pregunta: 'Tell me about yourself and why you think you'd be great for this role — it could be either customer service or sales.' Escribe tu respuesta completa de 30-45 segundos.",
+    tip: "Prepara y memoriza tu 'Tell me about yourself' — es la única pregunta que SIEMPRE aparece y donde más se gana o pierde la primera impresión."
+  },
+  {
+    label: "Día 7", title: "Simulacro final — repaso y confianza",
+    focus: "Hoy no aprendes nada nuevo. Hoy consolidas todo y subes la confianza.",
+    phrases: [
+      { en: "I'm confident in my ability to deliver great results.", es: "Para la entrevista — muestra seguridad" },
+      { en: "I'm a fast learner and I'm very motivated to grow in this role.", es: "Para cualquier gap de experiencia" },
+      { en: "My background in sales and customer interaction has prepared me well for this.", es: "Conecta tu experiencia con el rol" },
+      { en: "I work best when I can help people solve real problems.", es: "Para mostrar motivación genuina" },
+      { en: "I'm available to start immediately and I'm fully equipped for remote work.", es: "Cierra tu presentación con disponibilidad" },
+    ],
+    practice: "Simulacro completo: El evaluador dice 'Hello Luis, thanks for joining us today. Let's get started. First — tell me about yourself, your experience, and why you applied for this position.' Escribe tu respuesta más completa y profesional.",
+    tip: "La confianza se construye con preparación. Si llegaste al día 7 practicando, ya estás en el 75%+. Confía en tu trabajo."
+  }
+];
+
+// ── QUIZ DATA ─────────────────────────────────────────────
+const quizQuestions = [
+  { q: "A customer says: 'I've been on hold for 20 minutes! This is ridiculous!' What's the BEST first response?", options: ["'That's not my fault, the system was down.'", "'I completely understand your frustration, and I sincerely apologize for the wait. Let me help you right away.'", "'Please calm down, I'm doing my best.'", "'You should have called earlier.'"], correct: 1, exp: "Always validate the emotion first, then apologize, then take action. Never get defensive or blame the system." },
+  { q: "A sales prospect says: 'I need to think about it.' What do you say?", options: ["'Okay, I'll call you next week.'", "'Please make a decision now, the offer expires today.'", "'Of course! Just so I can help — what specific concerns can I address for you right now?'", "'That's fine, goodbye.'"], correct: 2, exp: "'I need to think about it' almost always means there's an unspoken objection. Always ask what they need to decide." },
+  { q: "Which phrase sounds most professional when you don't understand a customer?", options: ["'What? I didn't get that.'", "'Speak more slowly please.'", "'I'm sorry, could you please repeat that? I want to make sure I understand you correctly.'", "'Say that again?'"], correct: 2, exp: "Always apologize first ('I'm sorry'), then make the request, then explain why (to show you care about understanding)." },
+  { q: "A customer wants a refund but company policy says no refunds after 30 days. The purchase was 35 days ago. What do you do?", options: ["'Sorry, policy is policy. Nothing I can do.'", "'Let me speak with my supervisor to see what options we have available for you.'", "'I'll give you the refund, don't worry.'", "'You should have called earlier.'"], correct: 1, exp: "When policy limits you, escalate or offer alternatives. Never just say 'no' without offering a next step." },
+  { q: "How do you professionally put a customer on hold?", options: ["'Hold on a second.' [puts on hold]", "'Would it be okay if I put you on a brief hold while I look into this for you? It should only take about 2 minutes.'", "'Wait, I'll be right back.'", "'Don't go anywhere.'"], correct: 1, exp: "Always ASK permission before putting someone on hold, give a time estimate, and explain why." },
+  { q: "A prospect says: 'Your price is $200. Competitor X charges $150 for the same thing.' Best response?", options: ["'Well we're better quality.'", "'I can match that price.'", "'That's a fair point. Can I ask — what would you be giving up by going with the cheaper option? I want to make sure you have the full picture.'", "'They're lying about their price.'"], correct: 2, exp: "Never attack the competitor. Instead, help the customer think through the full value comparison themselves." },
+  { q: "Which opening is best for a cold sales call?", options: ["'Hi, are you interested in buying our product?'", "'Hi [Name], I know I'm catching you out of the blue — do you have about 27 seconds? I promise I'll be quick.'", "'Hello, I want to sell you something today.'", "'Good morning, are you the decision maker?'"], correct: 1, exp: "Acknowledge the interruption, ask for a small commitment (27 seconds feels easier to say yes to than 'a few minutes'), and show respect for their time." },
+  { q: "A customer resolves their issue and thanks you. What do you say to close the call?", options: ["'Okay, bye.'", "'No problem.'", "'You're very welcome! Before I let you go — is there anything else I can help you with today?'", "'Glad it worked out.'"], correct: 2, exp: "Always close with 'Is there anything else I can help you with today?' — it's the professional standard and shows you care about complete satisfaction." },
+];
+
+// ── STATE ─────────────────────────────────────────────────
+let currentDay = 0;
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+let chatHistory = [];
+let currentScenario = '';
+let practiceIndex = 0;
+
+// ── INIT ──────────────────────────────────────────────────
+window.onload = () => {
+  buildProgressBar();
+  buildDaySelector();
+  loadDay(0);
+  buildPractice();
+  buildQuiz();
+};
+
+function buildProgressBar() {
+  const wrap = document.getElementById('progressDays');
+  days.forEach((d, i) => {
+    const el = document.createElement('div');
+    el.className = 'prog-day' + (i === 0 ? ' active' : '');
+    el.id = 'prog-' + i;
+    el.title = d.label;
+    wrap.appendChild(el);
+  });
+}
+
+function buildDaySelector() {
+  const sel = document.getElementById('daySelector');
+  days.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = d.label;
+    btn.id = 'daybtn-' + i;
+    btn.onclick = () => loadDay(i);
+    sel.appendChild(btn);
+  });
+}
+
+function loadDay(idx) {
+  currentDay = idx;
+  const d = days[idx];
+
+  // Update selectors
+  document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.querySelectorAll('.prog-day').forEach((p, i) => {
+    p.classList.remove('active', 'done');
+    if (i < idx) p.classList.add('done');
+    if (i === idx) p.classList.add('active');
+  });
+
+  document.getElementById('lessonContent').innerHTML = `
+    <div class="card">
+      <div class="card-title">🎯 ${d.label}: ${d.title}</div>
+      <div class="card-body">${d.focus}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📖 Frases clave del día</div>
+      <div class="lesson-block">
+        <div class="label">Aprende estas — practica en voz alta</div>
+        <ul class="phrase-list">${d.phrases.map(p => `<li><span class="en">${p.en}</span><span class="es">${p.es}</span></li>`).join('')}</ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💡 Tip del día</div>
+      <div class="tip-box">${d.tip}</div>
+    </div>
+  `;
+}
+
+// ── PRACTICE ──────────────────────────────────────────────
+function buildPractice() {
+  const allScenarios = days.map((d, i) => ({ day: d.label, scenario: d.practice }));
+  let html = '';
+  allScenarios.forEach((s, i) => {
+    html += `
+      <div class="card">
+        <div class="card-title">${s.day} — Ejercicio escrito</div>
+        <div class="practice-box">
+          <div class="scenario-label">📋 Escenario</div>
+          <div class="scenario-text">${s.scenario}</div>
+          <textarea id="prac-${i}" placeholder="Write your response in English here..."></textarea>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="evaluatePractice(${i})">🤖 Evaluar con IA</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('prac-${i}').value=''">🗑️ Limpiar</button>
+          </div>
+          <div id="pfeedback-${i}" class="feedback-box"></div>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('practiceContent').innerHTML = html;
+}
+
+async function evaluatePractice(idx) {
+  const text = document.getElementById(`prac-${idx}`).value.trim();
+  if (!text) { alert('Escribe tu respuesta primero.'); return; }
+
+  const fb = document.getElementById(`pfeedback-${idx}`);
+  fb.className = 'feedback-box show';
+  fb.innerHTML = '<div class="loading"><span class="spinner"></span>Evaluando tu respuesta...</div>';
+
+  const scenario = days[idx].practice;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: `You are an English language evaluator for customer service and sales roles. Evaluate the user's English response to a workplace scenario. Score from 0-100%. Give feedback in Spanish (the user is a Spanish speaker learning professional English). Be encouraging but honest. Format your response as:
+
+SCORE: [number]%
+LEVEL: [Excellent/Good/Needs work]
+
+WHAT YOU DID WELL:
+- [specific positive points]
+
+AREAS TO IMPROVE:
+- [specific grammar or phrasing improvements with corrections]
+
+SUGGESTED REWRITE:
+[A professional version of what they wrote]
+
+Keep it concise and actionable.`,
+        messages: [{
+          role: 'user',
+          content: `Scenario: ${scenario}\n\nUser's response: ${text}`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content[0].text;
+    const scoreMatch = reply.match(/SCORE:\s*(\d+)/);
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : 70;
+    const isGood = score >= 70;
+
+    fb.className = `feedback-box show ${isGood ? 'good' : 'ok'}`;
+    fb.innerHTML = `
+      <div class="feedback-score ${isGood ? 'good' : 'ok'}">${score}% ${isGood ? '✅' : '⚠️'}</div>
+      <div class="feedback-text">${reply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+    `;
+  } catch (e) {
+    fb.innerHTML = '<div class="feedback-text" style="color:#f87171">Error al conectar con la IA. Intenta de nuevo.</div>';
+  }
+}
+
+// ── ROLEPLAY ──────────────────────────────────────────────
+const roleplayPrompts = {
+  angry: { title: "😡 Cliente enojado — Customer Service", system: `You are an angry customer calling customer support. Your name is Michael. Your problem: you ordered a laptop 2 weeks ago, it arrived broken, and you've tried to get help 3 times with no resolution. You are frustrated but respond to genuine empathy and helpfulness. Start the call angry. The user (Luis) is the customer service agent. Respond realistically — calm down gradually if he handles it well, escalate if he's dismissive. Keep responses short (1-3 sentences). After 6-8 exchanges, add [END] and give a brief evaluation in Spanish of how Luis handled the call.`, opener: "Finally someone picked up! I've been trying to get help for TWO WEEKS and nobody has done ANYTHING about my broken laptop. This is completely unacceptable!" },
+  sales: { title: "💼 Llamada de ventas outbound", system: `You are a busy business owner named Sarah. Luis is calling you to sell a CRM software subscription ($99/month). You are skeptical but polite. You currently use spreadsheets. You have objections: price, time to switch, "we're doing fine". Respond to good sales technique positively. Keep responses short. After 6-8 exchanges, add [END] and evaluate in Spanish.`, opener: "Hello? Who is this?" },
+  interview: { title: "🎙️ Entrevista de trabajo en inglés", system: `You are a hiring manager at a US remote company interviewing Luis for a bilingual customer service / sales representative position. Ask real interview questions one at a time. Be professional and friendly. Evaluate his English fluency and professionalism. Ask 5-6 questions naturally. After the last question, add [END] and give detailed feedback in Spanish about his interview performance.`, opener: "Hi Luis! Thanks for joining us today. I'm Jennifer, the hiring manager. How are you doing?" },
+  support: { title: "🎧 Soporte técnico bilingüe", system: `You are a customer named Carlos who speaks both English and Spanish but prefers English. You have a technical problem: you can't log into your account, it says your password is wrong, and the reset email never arrives. You're mildly frustrated but cooperative. Luis is the support agent. Keep responses short. After 6-8 exchanges, add [END] and evaluate in Spanish.`, opener: "Hi, I need help with my account. I can't log in and the password reset isn't working." },
+};
+
+function startRoleplay(scenario) {
+  currentScenario = scenario;
+  const rp = roleplayPrompts[scenario];
+  chatHistory = [{ role: 'assistant', content: rp.opener }];
+
+  document.getElementById('roleplayCard').style.display = 'block';
+  document.getElementById('roleplayTitle').textContent = rp.title;
+  document.getElementById('roleplayFeedback').innerHTML = '';
+  renderChat();
+  document.getElementById('userMsg').focus();
+}
+
+function renderChat() {
+  const win = document.getElementById('chatWindow');
+  win.innerHTML = chatHistory.map(m => `
+    <div class="msg ${m.role === 'user' ? 'user' : 'bot'}">
+      <div>
+        <div class="msg-label">${m.role === 'user' ? 'Tú (Luis)' : '📞 Cliente/Entrevistador'}</div>
+        <div class="msg-bubble">${m.content.replace('[END]', '').trim()}</div>
+      </div>
+    </div>
+  `).join('');
+  win.scrollTop = win.scrollHeight;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('userMsg');
+  const text = input.value.trim();
+  if (!text) return;
+
+  chatHistory.push({ role: 'user', content: text });
+  input.value = '';
+  renderChat();
+
+  const rp = roleplayPrompts[currentScenario];
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        system: rp.system,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content[0].text;
+    chatHistory.push({ role: 'assistant', content: reply });
+    renderChat();
+
+    if (reply.includes('[END]')) {
+      showRoleplayFeedback(reply);
+    }
+  } catch (e) {
+    chatHistory.push({ role: 'assistant', content: '(Error de conexión — intenta de nuevo)' });
+    renderChat();
+  }
+}
+
+function showRoleplayFeedback(reply) {
+  const parts = reply.split('[END]');
+  const feedback = parts[1] || parts[0];
+  document.getElementById('roleplayFeedback').innerHTML = `
+    <div class="card" style="margin-top:16px; border-color:#22c55e40; background:#14532d20;">
+      <div class="card-title">✅ Evaluación del roleplay</div>
+      <div class="feedback-text">${feedback.trim().replace(/\n/g, '<br>')}</div>
+    </div>
+  `;
+}
+
+function endRoleplay() {
+  if (chatHistory.length < 3) { alert('Practica un poco más antes de terminar.'); return; }
+  chatHistory.push({ role: 'user', content: '[The roleplay is ending now. Please evaluate Luis\'s English performance in Spanish, give a score out of 100, and list specific improvements.]' });
+  sendMsg();
+}
+
+// ── QUIZ ──────────────────────────────────────────────────
+function buildQuiz() {
+  loadQuizQuestion();
+}
+
+function loadQuizQuestion() {
+  if (quizIndex >= quizQuestions.length) {
+    showQuizResults();
+    return;
+  }
+  const q = quizQuestions[quizIndex];
+  const pct = Math.round((quizIndex / quizQuestions.length) * 100);
+
+  document.getElementById('quizContent').innerHTML = `
+    <div class="card">
+      <div style="font-size:12px;color:#64748b;margin-bottom:12px;">Pregunta ${quizIndex + 1} de ${quizQuestions.length} · Puntaje: ${quizScore}/${quizIndex}</div>
+      <div style="height:4px;background:#334155;border-radius:99px;margin-bottom:16px;"><div style="height:4px;background:#2e75b6;width:${pct}%;border-radius:99px;"></div></div>
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options">
+        ${q.options.map((o, i) => `<button class="quiz-option" onclick="answerQuiz(${i})">${o}</button>`).join('')}
+      </div>
+      <div id="qfeedback"></div>
+      <div class="btn-row" id="nextBtnWrap" style="display:none; margin-top:12px;">
+        <button class="btn btn-primary" onclick="nextQuizQuestion()">Siguiente →</button>
+      </div>
+    </div>
+  `;
+}
+
+function answerQuiz(idx) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = quizQuestions[quizIndex];
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach(o => o.classList.add('disabled'));
+  opts[idx].classList.add(idx === q.correct ? 'correct' : 'wrong');
+  if (idx !== q.correct) opts[q.correct].classList.add('correct');
+  if (idx === q.correct) quizScore++;
+  document.getElementById('qfeedback').innerHTML = `<div class="quiz-feedback ${idx === q.correct ? 'correct' : 'wrong'}">${idx === q.correct ? '✅ Correcto! ' : '❌ Incorrecto. '}${q.exp}</div>`;
+  document.getElementById('nextBtnWrap').style.display = 'flex';
+}
+
+function nextQuizQuestion() {
+  quizIndex++;
+  quizAnswered = false;
+  loadQuizQuestion();
+}
+
+function showQuizResults() {
+  const pct = Math.round((quizScore / quizQuestions.length) * 100);
+  const pass = pct >= 70;
+  document.getElementById('quizContent').innerHTML = `
+    <div class="card" style="text-align:center; padding:40px 20px;">
+      <div style="font-size:64px;font-weight:800;color:${pass ? '#4ade80' : '#fbbf24'}">${pct}%</div>
+      <div style="font-size:20px;font-weight:700;color:#e2e8f0;margin:12px 0;">${pass ? '✅ Pasaste el nivel mínimo!' : '⚠️ Sigue practicando'}</div>
+      <div style="color:#94a3b8;font-size:14px;margin-bottom:24px;">${quizScore} de ${quizQuestions.length} correctas · Mínimo requerido: 70%</div>
+      <div style="color:${pct >= 75 ? '#4ade80' : pct >= 70 ? '#fbbf24' : '#f87171'};font-size:15px;font-weight:600;margin-bottom:24px;">
+        ${pct >= 75 ? '🎯 Estás listo para la evaluación de trabajo!' : pct >= 70 ? '💪 Pasas el mínimo — sigue practicando para más seguridad' : '📚 Repasa los días 2-4 y vuelve a intentarlo'}
+      </div>
+      <button class="btn btn-primary" onclick="quizIndex=0;quizScore=0;quizAnswered=false;loadQuizQuestion()">🔄 Intentar de nuevo</button>
+    </div>
+  `;
+}
+
+// ── TAB NAV ───────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
